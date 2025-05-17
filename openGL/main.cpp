@@ -9,18 +9,26 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
-const int MAX_VERTS = 1000 * 5 * 6;
+void getBuildMode(GLFWwindow* window);
+bool processInput(GLFWwindow* window);
 
-void processInput(GLFWwindow* window);
-bool processInput(GLFWwindow* window, std::vector<float>& vertices);
 std::vector<float> makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax);
+
 struct UV {
     float uMin, uMax, vMin, vMax;
 };
 
 UV calculateUV(int coordX, int coordY);
 
+struct Tile {
+    glm::vec2 position;
+    std::vector<float> vertices;
+};
 
+std::vector<Tile> placedTiles;
+
+void writeToFile(const std::vector<Tile>& allTiles);
+void readFromFile(const std::string fileName);
 //********************************************************************
 //                         GLOBAL VARS
 //********************************************************************
@@ -31,7 +39,22 @@ const float blockSize = 0.2;
 float currentX = -0.5f;
 float currentY = -0.5f;
 float UVSize = 1.0f / tileSize;
+const int MAX_VERTS = 1000 * 5 * 6;
 
+//********************************************************************
+//                          Tile Enum
+//********************************************************************
+enum tileType {
+    Grass,
+    Side,
+    Dirt,
+    Stone,
+    Coal,
+    Iron,
+    Gravel,
+    Sand
+};
+tileType selectedTile = Side;
 //********************************************************************
 //                         Texture Atlas vars
 //********************************************************************
@@ -175,17 +198,23 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         // input processing here:
-        processInput(window);
+        getBuildMode(window);
         
         if (buildMode)
         {
-            verticesChanged = processInput(window, verticeVector);
+            verticesChanged = processInput(window);
         }
 
         if (verticesChanged)
         {
+            verticeVector.clear();
+
+            for (const Tile& tiles : placedTiles)
+            {
+                verticeVector.insert(verticeVector.end(), tiles.vertices.begin(), tiles.vertices.end());
+            }
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, verticeVector.size() * sizeof(float), verticeVector.data());
+            glBufferData(GL_ARRAY_BUFFER, verticeVector.size() * sizeof(float), verticeVector.data(), GL_STATIC_DRAW);
             std::cout << "Buffer updated\n";
             verticesChanged = false;
             
@@ -201,6 +230,8 @@ int main(void)
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
+
+        
 
         if (!verticeVector.empty()) {
             glDrawArrays(GL_TRIANGLES, 0, verticeVector.size() / 5);
@@ -220,9 +251,13 @@ int main(void)
 //********************************************************************
 //                         Process Inputs
 //********************************************************************
-void processInput(GLFWwindow* window) 
-{
 
+void getBuildMode(GLFWwindow* window) 
+{
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    {
+        writeToFile(placedTiles);
+    }
     
 
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
@@ -239,26 +274,49 @@ void processInput(GLFWwindow* window)
 
 }
 
-bool processInput(GLFWwindow* window, std::vector<float>& vertices)
+bool processInput(GLFWwindow* window)
 {
     static bool mouseHeld = false;
-    static bool oneHeld = false;
     double xpos, ypos;
-    /* TODO IMPLEMENT METHOD maybe add an enum check method for all of the different textures idk.
-    if (glfwGetKey(window, GLFW_KEY_1) && !oneHeld)
+    std::vector<float> baseTile;
+
+    if (glfwGetKey(window, GLFW_KEY_1))
     {
-        for (int i = 0; i < 6;)
-        {
-            int idx = i * 5;
-            vertices.push_back(baseTile[idx + 0]);               // x
-            vertices.push_back(baseTile[idx + 1]);               // y
-            vertices.push_back(baseTile[idx + 2]);               // z
-            vertices.push_back(baseTile[idx + 3]);
-        }
+        selectedTile = Grass;
     }
-    */
+    else if (glfwGetKey(window, GLFW_KEY_2))
+    {
+        selectedTile = Side;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_3))
+    {
+        selectedTile = Dirt;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_4))
+    {
+        selectedTile = Stone;
+    }
+    
+    
+    
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !mouseHeld)
     {
+
+        UV uv;
+        if (selectedTile == Grass)
+        {
+            uv = calculateUV(grassX, grassY);
+        }
+        else if (selectedTile == Side)
+        {
+            uv = calculateUV(sideX, sideY);
+        }
+        else if (selectedTile == Dirt)
+        {
+            uv = calculateUV(dirtX, dirtY);
+        }
+
+        baseTile = makeBaseTile(blockSize, uv.uMin, uv.uMax, uv.vMin, uv.vMax);
         
         std::cout << "left click detected" << std::endl;
         glfwGetCursorPos(window, &xpos, &ypos);
@@ -272,25 +330,99 @@ bool processInput(GLFWwindow* window, std::vector<float>& vertices)
         float snappedY = floor(ndcY / blockSize) * blockSize + blockSize / 2.0f;
 
         std::cout << "snappedX: " << snappedX << "snappedY: " << snappedY << std::endl;
-        
-        UV grassUV = calculateUV(1, 15);
-        std::vector<float> baseTile = makeBaseTile(blockSize, grassUV.uMin, grassUV.uMax, grassUV.vMin, grassUV.vMax);
 
-        for (int i = 0; i < 6; i++)
+        Tile newTile;
+        newTile.position = { snappedX, snappedY };
+
+        bool tileExists = false;
+        for (const Tile& tile : placedTiles)
         {
-            int idx = i * 5;
-            vertices.push_back(baseTile[idx + 0] + snappedX);    // x
-            vertices.push_back(baseTile[idx + 1] + snappedY);    // y
-            vertices.push_back(baseTile[idx + 2]);               // z
-            vertices.push_back(baseTile[idx + 3]);               // u
-            vertices.push_back(baseTile[idx + 4]);               // v
+            if (tile.position == newTile.position)
+            {
+                tileExists = true;
+                break;
+            }
         }
-        mouseHeld = true;
-        return true;
+
+        if (!tileExists)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                int idx = i * 5;
+                newTile.vertices.push_back(baseTile[idx + 0] + snappedX);    // x
+                newTile.vertices.push_back(baseTile[idx + 1] + snappedY);    // y
+                newTile.vertices.push_back(baseTile[idx + 2]);               // z
+                newTile.vertices.push_back(baseTile[idx + 3]);               // u
+                newTile.vertices.push_back(baseTile[idx + 4]);               // v
+            }
+            placedTiles.push_back(newTile);
+            mouseHeld = true;
+            return true;
+        }
     }
     else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
         mouseHeld = false;
     }
+
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
+    {
+
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        float ndcX = (xpos / width) * 2.0 - 1.0;
+        float ndcY = 1.0 - (ypos / height) * 2.0; // Y is flipped due to opengl origin being bottom left.
+
+        float snappedX = floor(ndcX / blockSize) * blockSize + blockSize / 2.0f;
+        float snappedY = floor(ndcY / blockSize) * blockSize + blockSize / 2.0f;
+
+        glm::vec2 checkPos = { snappedX, snappedY };
+
+        for (auto x = placedTiles.begin(); x != placedTiles.end(); x++)
+        {
+            if (x->position == checkPos)
+            {
+                placedTiles.erase(x);
+                mouseHeld = true;
+                break;
+            }
+        }
+        return true;
+    } 
+    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+    {
+        mouseHeld = false;
+    }
     return false;
+}
+
+//********************************************************************
+//                         File I/O
+//********************************************************************
+// WE WORKING ON THIS ONE. 
+void writeToFile(const std::vector<Tile>& allTiles)
+{
+    for (int i = 0; i < allTiles.size(); i++)
+    {
+        const Tile& newTile = allTiles[i];
+        std::cout << "Tile at position (" << newTile.position.x << ", " << newTile.position.y << ")\n";
+
+        for (int j = 0; j < newTile.vertices.size(); j += 5)
+        {
+            std::cout << "  Vertex " << j / 5 << ": "
+                << "x=" << newTile.vertices[j + 0] << ", "
+                << "y=" << newTile.vertices[j + 1] << ", "
+                << "z=" << newTile.vertices[j + 2] << ", "
+                << "u=" << newTile.vertices[j + 3] << ", "
+                << "v=" << newTile.vertices[j + 4] << '\n';
+        }
+    }
+}
+// WE ALSO WORKING ON THIS ONE.
+void readFromFile(const std::string fileName)
+{
+
 }
