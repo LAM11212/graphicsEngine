@@ -24,6 +24,9 @@
     <ClCompile Include="dependencies\include\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tileCreator\tileCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\GLFW\glfw3.h">
@@ -908,18 +911,18 @@
     <ClInclude Include="dependencies\include\glm\detail\type_vec4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tileCreator\tileCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="textures\container.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="textures\awesomeface.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="textures\blocks.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="player\playerSprite.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

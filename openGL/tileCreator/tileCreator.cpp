@@ -1,0 +1,174 @@
+#include "tileCreator.h"
+#include <fstream>
+#include <string>
+#include <sstream>
+
+tileCreator::tileCreator() {}
+
+std::vector<float> tileCreator::makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax)
+{
+    return {
+        //       x                   y         z      u     v
+        -0.5f * blockSize, -0.5f * blockSize, 0.0f, uMin, vMin,
+         0.5f * blockSize, -0.5f * blockSize, 0.0f, uMax, vMin,
+         0.5f * blockSize,  0.5f * blockSize, 0.0f, uMax, vMax,
+
+         0.5f * blockSize,  0.5f * blockSize, 0.0f, uMax, vMax,
+        -0.5f * blockSize,  0.5f * blockSize, 0.0f, uMin, vMax,
+        -0.5f * blockSize, -0.5f * blockSize, 0.0f, uMin, vMin
+    };
+}
+
+void tileCreator::writeToFile(const std::vector<Tile>& allTiles, std::string fileName)
+{
+    std::ofstream file;
+    file.open(fileName);
+
+    if (file.is_open())
+    {
+        for (int i = 0; i < allTiles.size(); i++)
+        {
+            const Tile& newTile = allTiles[i];
+            for (int j = 0; j < newTile.vertices.size(); j += 5)
+            {
+                file
+                    << newTile.vertices[j + 0] << ", "
+                    << newTile.vertices[j + 1] << ", "
+                    << newTile.vertices[j + 2] << ", "
+                    << newTile.vertices[j + 3] << ", "
+                    << newTile.vertices[j + 4] << '\n';
+            }
+        }
+        file.close();
+        std::cout << "data written successfully" << std::endl;
+    }
+    else {
+        std::cout << "failed to open file." << std::endl;
+    }
+}
+
+void tileCreator::readFromFile(std::vector<Tile>& allTiles, const std::string fileName)
+{
+    std::ifstream file(fileName);
+    if (!file.is_open())
+    {
+        std::cout << "failed to opne file." << std::endl;
+        return;
+    }
+
+    std::string line;
+    std::vector<float> tempVerts;
+    while (std::getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string val;
+        float f;
+
+        for (int i = 0; i < 5; i++)
+        {
+            std::getline(ss, val, ',');
+            try
+            {
+                f = std::stof(val);
+                tempVerts.push_back(f);
+            }
+            catch (std::exception e)
+            {
+                std::cout << e.what() << std::endl;
+                break;
+            }
+        }
+
+        if (tempVerts.size() == 30)
+        {
+            Tile newTile;
+            newTile.vertices = tempVerts;
+
+            newTile.position.x = newTile.vertices[0];
+            newTile.position.y = newTile.vertices[1];
+
+            allTiles.push_back(newTile);
+            tempVerts.clear();
+        }
+    }
+    file.close();
+    std::cout << "loaded " << allTiles.size() << " tile correctly. yahooo!" << std::endl;
+}
+
+tileCreator::UV tileCreator::calculateUV(int coordX, int coordY)
+{
+    float uMin = coordX * UVSize;
+    float uMax = uMin + UVSize;
+    float vMin = coordY * UVSize;
+    float vMax = vMin + UVSize;
+    return { uMin, uMax, vMin, vMax };
+}
+
+void tileCreator::selectTile(tileType type)
+{
+    selectedTile = type;
+}
+
+bool tileCreator::placeTile(float x, float y, float blockSize)
+{
+    glm::vec2 pos = { x, y };
+
+    for (const auto& tile : placedTiles) {
+        if (tile.position == pos) return false;  // already placed
+    }
+
+    int texX = 0, texY = 0;
+    switch (selectedTile) {
+    case Grass: texX = grassX; texY = grassY; break;
+    case Side: texX = sideX; texY = sideY; break;
+    case Dirt: texX = dirtX; texY = dirtY; break;
+    case Stone: texX = stoneX; texY = stoneY; break;
+    case Coal: texX = coalX; texY = coalY; break;
+    case Iron: texX = ironX; texY = ironY; break;
+    case Gravel: texX = gravelX; texY = gravelY; break;
+    case Sand: texX = sandX; texY = sandY; break;
+    case Water: texX = waterX; texY = waterY; break;
+    case Lava: texX = lavaX; texY = lavaY; break;
+    }
+
+    UV uv = calculateUV(texX, texY);
+    std::vector<float> baseTile = makeBaseTile(blockSize, uv.uMin, uv.uMax, uv.vMin, uv.vMax);
+
+    Tile newTile;
+    newTile.position = pos;
+    for (int i = 0; i < 6; ++i) {
+        int idx = i * 5;
+        newTile.vertices.push_back(baseTile[idx + 0] + x); // X
+        newTile.vertices.push_back(baseTile[idx + 1] + y); // Y
+        newTile.vertices.push_back(baseTile[idx + 2]);     // Z
+        newTile.vertices.push_back(baseTile[idx + 3]);     // U
+        newTile.vertices.push_back(baseTile[idx + 4]);     // V
+    }
+
+    placedTiles.push_back(newTile);
+    return true;
+}
+
+bool tileCreator::removeTile(float x, float y)
+{
+    glm::vec2 checkPos = { x, y };
+
+    for (auto x = placedTiles.begin(); x != placedTiles.end(); x++)
+    {
+        if (x->position == checkPos)
+        {
+            placedTiles.erase(x);
+            break;
+        }
+    }
+    return true;
+}
+
+void tileCreator::updateVertexBuffer()
+{
+    verticeVector.clear();
+    for (const Tile& tile : placedTiles)
+    {
+        verticeVector.insert(verticeVector.end(), tile.vertices.begin(), tile.vertices.end());
+    }
+}
