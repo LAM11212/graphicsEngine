@@ -20,9 +20,6 @@ const int tileSize = 16;
 bool buildMode = false;
 bool verticesChanged = false;
 const float blockSize = 0.1;
-float currentX = -0.5f;
-float currentY = -0.5f;
-float UVSize = 1.0f / tileSize;
 const int MAX_VERTS = 1000 * 5 * 6;
 bool pKeyPressed = false;
 bool lKeyPressed = false;
@@ -143,9 +140,6 @@ int main(void)
 
     tileCreator tc;
 
-    tc.placeTile(0.0f, 0.0f, blockSize);
-    verticesChanged = true;
-
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -154,7 +148,6 @@ int main(void)
 
         // input processing here:
         getBuildMode(window, tc);
-        
         if (buildMode)
         {
             verticesChanged = processInput(window, tc, blockSize);
@@ -267,15 +260,13 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize)
     {
         if (tc.placeTile(snappedX, snappedY, blockSize))
         {
-            mouseHeld = true;
             return true;
         }
     }
-    else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+    else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
     {
         if (tc.removeTile(snappedX, snappedY))
         {
-            mouseHeld = true;
             return true;
         }
     }
