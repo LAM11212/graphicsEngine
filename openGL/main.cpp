@@ -23,7 +23,7 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize);
 const int tileSize = 16;
 bool buildMode = false;
 bool verticesChanged = false;
-const float blockSize = 0.1;
+const float blockSize = 10.0f;
 const int MAX_VERTS = 1000 * 5 * 6;
 bool pKeyPressed = false;
 bool lKeyPressed = false;
@@ -47,7 +47,7 @@ int main(void)
 
 
     // Create window and OpenGL context
-    window = glfwCreateWindow(1200, 800, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1200, 800, "IDKENGINE", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -63,7 +63,7 @@ int main(void)
         return -1;
     }
 
-    glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+    glm::mat4 proj = glm::ortho(0.0f, 1200.0f, 0.0f, 800.0f, -1.0f, 1.0f);
 
     Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
     myShader.use();
@@ -280,11 +280,12 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize)
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    float worldX = ((xpos / width) * 4.0f) - 2.0f;
-    float worldY = ((1.0f - ypos / height) * 3.0f) - 1.5f;
+    float worldX = static_cast<float>(xpos);
+    float worldY = static_cast<float>(height - ypos);
 
     float snappedX = floor(worldX / blockSize) * blockSize + blockSize / 2.0f;
     float snappedY = floor(worldY / blockSize) * blockSize + blockSize / 2.0f;
+
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) tc.selectTile(tileCreator::Grass);
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) tc.selectTile(tileCreator::Side);
