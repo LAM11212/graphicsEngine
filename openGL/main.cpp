@@ -1,7 +1,6 @@
 ﻿#include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -12,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "tileCreator/tileCreator.h"
+#include "tileEditor/tileCreator.h"
 
 void getBuildMode(GLFWwindow* window, tileCreator& tc);
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize);
@@ -23,13 +22,13 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize);
 const int tileSize = 16;
 bool buildMode = false;
 bool verticesChanged = false;
-const float blockSize = 10.0f;
+int blockSize = 20;
 const int MAX_VERTS = 1000 * 5 * 6;
 bool pKeyPressed = false;
 bool lKeyPressed = false;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
+bool gridEnabled = false;
 //********************************************************************
 //                         Main Function
 //********************************************************************
@@ -210,10 +209,16 @@ int main(void)
         static float f = 0.0f;
         static int counter = 0;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Tile Editor");
 
-        ImGui::SliderFloat3("float", &translation.x, 0.0f, 1200.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::SliderFloat3("float", &translation.x, 0.0f, 1200.0f);
+        ImGui::Checkbox("Show Grid", &gridEnabled);
+        if (gridEnabled)
+        {
+            tc.drawGrid(1200, 800, blockSize, proj);
+        } 
 
+        //TODO: add a way to toggle between different maps using a drop down menu, also implement save/load functions.
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         

@@ -24,7 +24,7 @@
     <ClCompile Include="dependencies\include\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tileCreator\tileCreator.cpp">
+    <ClCompile Include="tileEditor\tileCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
@@ -932,7 +932,7 @@
     <ClInclude Include="dependencies\include\glm\detail\type_vec4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tileCreator\tileCreator.h">
+    <ClInclude Include="tileEditor\tileCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
@@ -1394,5 +1394,7 @@
     <None Include="dependencies\include\glm\detail\type_vec4_simd.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="tileEditor\grid.vs" />
+    <None Include="tileEditor\grid.fs" />
   </ItemGroup>
 </Project>

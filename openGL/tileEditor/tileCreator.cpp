@@ -1,4 +1,7 @@
 #include "tileCreator.h"
+#include "../Shader.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -171,4 +174,53 @@ void tileCreator::updateVertexBuffer()
     {
         verticeVector.insert(verticeVector.end(), tile.vertices.begin(), tile.vertices.end());
     }
+}
+
+void tileCreator::drawGrid(float width, float height, float blockSize, const glm::mat4& projection)
+{
+    std::vector<float> lines;
+
+    for (float x = 0; x <= width; x += blockSize)
+    {
+        lines.push_back(x);
+        lines.push_back(0.0f);
+        lines.push_back(0.0f);
+
+        lines.push_back(x);
+        lines.push_back(height);
+        lines.push_back(0.0f);
+    }
+
+    for (float y = 0; y <= height; y += blockSize)
+    {
+        lines.push_back(0.0f);
+        lines.push_back(y);
+        lines.push_back(0.0f);
+
+        lines.push_back(width);
+        lines.push_back(y);
+        lines.push_back(0.0f);
+    }
+
+    Shader gridShader("tileEditor/grid.vs", "tileEditor/grid.fs");
+
+    unsigned int vao, vbo;
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float), lines.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    gridShader.use();
+    gridShader.setMat4("projection", projection);
+    glDrawArrays(GL_LINES, 0, lines.size() / 3);
+
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
+
 }

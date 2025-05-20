@@ -42,8 +42,9 @@ public:
 	bool removeTile(float x, float y);
 	void selectTile(tileType type);
 	void updateVertexBuffer();
+	void drawGrid(float width, float height, float blockSize, const glm::mat4& projection);
 
-	tileType selectedTile = Grass;
+	tileType selectedTile;
 
 private:
 	
