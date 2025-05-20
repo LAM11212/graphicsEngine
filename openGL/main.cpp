@@ -63,8 +63,11 @@ int main(void)
         return -1;
     }
 
-    Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
+    glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
 
+    Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
+    myShader.use();
+    myShader.setMat4("projection", proj);
     
     //********************************************************************
     //                         VAO/VBO Initialization
@@ -144,6 +147,10 @@ int main(void)
 
     tileCreator tc;
 
+    bool show_demo_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -191,8 +198,16 @@ int main(void)
 
         }
 
-        ImGui::Begin("windowww");
-        ImGui::Text("Hello there");
+        static float f = 0.0f;
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        
         ImGui::End();
 
         ImGui::Render();
@@ -265,11 +280,11 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize)
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    float ndcX = (xpos / width) * 2.0 - 1.0;
-    float ndcY = 1.0 - (ypos / height) * 2.0; // Y is flipped due to opengl origin being bottom left.
+    float worldX = ((xpos / width) * 4.0f) - 2.0f;
+    float worldY = ((1.0f - ypos / height) * 3.0f) - 1.5f;
 
-    float snappedX = floor(ndcX / blockSize) * blockSize + blockSize / 2.0f;
-    float snappedY = floor(ndcY / blockSize) * blockSize + blockSize / 2.0f;
+    float snappedX = floor(worldX / blockSize) * blockSize + blockSize / 2.0f;
+    float snappedY = floor(worldY / blockSize) * blockSize + blockSize / 2.0f;
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) tc.selectTile(tileCreator::Grass);
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) tc.selectTile(tileCreator::Side);
