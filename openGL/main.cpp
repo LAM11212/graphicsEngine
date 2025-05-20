@@ -66,8 +66,7 @@ int main(void)
     glm::mat4 proj = glm::ortho(0.0f, 1200.0f, 0.0f, 800.0f, -1.0f, 1.0f);
 
     Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
-    myShader.use();
-    myShader.setMat4("projection", proj);
+    
     
     //********************************************************************
     //                         VAO/VBO Initialization
@@ -157,6 +156,10 @@ int main(void)
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 400");
+
+    glm::vec3 translation(0, 0, 0);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -186,6 +189,12 @@ int main(void)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 mvp = proj * view * model;
+
+        myShader.use();
+        myShader.setMat4("projection", mvp);
+
         glBindVertexArray(VAO);
 
         myShader.use();
@@ -203,7 +212,7 @@ int main(void)
 
         ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::SliderFloat3("float", &translation.x, 0.0f, 1200.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
