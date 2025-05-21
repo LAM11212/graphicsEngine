@@ -224,3 +224,25 @@ void tileCreator::drawGrid(float width, float height, float blockSize, const glm
     glDeleteVertexArrays(1, &vao);
 
 }
+
+tileCreator::UV tileCreator::getTileUVs(int num)
+{
+    
+    int texX = 0, texY = 0;
+    switch (num) {
+    case 0: texX = grassX; texY = grassY; break;
+    case 1: texX = sideX; texY = sideY; break;
+    case 2: texX = dirtX; texY = dirtY; break;
+    case 3: texX = stoneX; texY = stoneY; break;
+    case 4: texX = coalX; texY = coalY; break;
+    case 5: texX = ironX; texY = ironY; break;
+    case 6: texX = gravelX; texY = gravelY; break;
+    case 7: texX = sandX; texY = sandY; break;
+    case 8: texX = waterX; texY = waterY; break;
+    case 9: texX = lavaX; texY = lavaY; break;
+    }
+
+    UV uv = calculateUV(texX, texY);
+
+    return uv;
+}

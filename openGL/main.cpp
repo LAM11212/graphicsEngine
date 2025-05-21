@@ -159,6 +159,13 @@ int main(void)
     glm::vec3 translation(0, 0, 0);
     glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
+    tileCreator::UV uv;
+
+    ImTextureID my_tex_id = (ImTextureID)(intptr_t)texture;
+    ImVec2 size = ImVec2(32.0f, 32.0f);
+    ImVec4 bg_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -216,7 +223,16 @@ int main(void)
         if (gridEnabled)
         {
             tc.drawGrid(1200, 800, blockSize, proj);
-        } 
+        }
+
+        for (int i = 0; i < 10; i++)
+        {
+            uv = tc.getTileUVs(i);
+            ImVec2 uv0 = ImVec2(uv.uMin, uv.vMax);
+            ImVec2 uv1 = ImVec2(uv.uMax, uv.vMin);
+            std::string label = "Tile_" + std::to_string(i);
+            ImGui::ImageButton(label.c_str(), my_tex_id, size, uv0, uv1, bg_color, tint_col);
+        }
 
         //TODO: add a way to toggle between different maps using a drop down menu, also implement save/load functions.
 
