@@ -224,7 +224,7 @@ int main(void)
         {
             tc.drawGrid(1200, 800, blockSize, proj);
         }
-
+        int columns = 3;
         for (int i = 0; i < 10; i++)
         {
             uv = tc.getTileUVs(i);
@@ -232,7 +232,12 @@ int main(void)
             ImVec2 uv1 = ImVec2(uv.uMax, uv.vMin);
             std::string label = "Tile_" + std::to_string(i);
             ImGui::ImageButton(label.c_str(), my_tex_id, size, uv0, uv1, bg_color, tint_col);
+            if ((i + 1) % columns != 0)
+            {
+                ImGui::SameLine();
+            }
         }
+        ImGui::NewLine();
 
         //TODO: add a way to toggle between different maps using a drop down menu, also implement save/load functions.
 
