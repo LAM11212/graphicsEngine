@@ -47,7 +47,7 @@ public:
 	void drawGrid(float width, float height, float blockSize, const glm::mat4& projection);
 	UV getTileUVs(int num);
 	void clear();
-
+	const char* getStringFromEnum(tileCreator::tileType type);
 
 	tileType selectedTile = Grass;
 

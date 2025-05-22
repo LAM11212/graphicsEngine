@@ -257,3 +257,20 @@ void tileCreator::clear()
     verticeVector.clear();
     updateVertexBuffer();
 }
+
+const char* tileCreator::getStringFromEnum(tileCreator::tileType type) 
+{
+    switch (type) {
+    case tileCreator::Grass: return "Grass";
+    case tileCreator::Side: return "Side";
+    case tileCreator::Dirt: return "Dirt";
+    case tileCreator::Stone: return "Stone";
+    case tileCreator::Coal: return "Coal";
+    case tileCreator::Iron: return "Iron";
+    case tileCreator::Gravel: return "Gravel";
+    case tileCreator::Sand: return "Sand";
+    case tileCreator::Water: return "Water";
+    case tileCreator::Lava: return "Lava";
+    default: return "Unknown";
+    }
+}

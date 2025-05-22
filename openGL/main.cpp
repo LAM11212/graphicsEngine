@@ -241,14 +241,18 @@ int main(void)
         int columns = 3;
         for (int i = 0; i < 10; i++)
         {
-            uv = tc.getTileUVs(i);
+            uv = activeMap.getTileUVs(i);
             ImVec2 uv0 = ImVec2(uv.uMin, uv.vMax);
             ImVec2 uv1 = ImVec2(uv.uMax, uv.vMin);
             std::string label = "Tile_" + std::to_string(i);
             if (ImGui::ImageButton(label.c_str(), my_tex_id, size, uv0, uv1, bg_color, tint_col))
             {
-                tc.selectTile(static_cast<tileCreator::tileType>(i));
+                activeMap.selectTile(static_cast<tileCreator::tileType>(i));
                 std::cout << "Tile " << i << " selected\n";
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Type: %s", activeMap.getStringFromEnum(static_cast<tileCreator::tileType>(i)));
             }
             if ((i + 1) % columns != 0)
             {
@@ -257,7 +261,6 @@ int main(void)
         }
         ImGui::NewLine();
 
-        //TODO: FIX THE TOGGLING BETWEEN MAPS TO CLEAR THE SCREEN
         if (!mm.mapNames.empty() && mm.currentMapIndex < mm.mapNames.size())
         {
             if (ImGui::BeginCombo("Map Selector", mm.mapNames[mm.currentMapIndex].c_str()))
