@@ -19,6 +19,8 @@ public:
 		float uMin, uMax, vMin, vMax;
 	};
 
+	int index = 0;
+
 	enum tileType {
 		Grass,
 		Side,
@@ -31,7 +33,7 @@ public:
 		Water,
 		Lava
 	};
-	std::vector<Tile> placedTiles;
+	std::vector<std::vector<Tile>> placedTiles;
 	std::vector<float> verticeVector;
 
 	std::vector<float> makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax);

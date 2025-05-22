@@ -143,6 +143,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mapManager\mapManager.cpp" />
     <ClCompile Include="tileEditor\tileCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +449,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="mapManager\mapManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="tileEditor\tileCreator.h" />
   </ItemGroup>

@@ -114,9 +114,13 @@ void tileCreator::selectTile(tileType type)
 
 bool tileCreator::placeTile(float x, float y, float blockSize)
 {
+    if (placedTiles.empty())
+    {
+        placedTiles.push_back({});
+    }
     glm::vec2 pos = { x, y };
 
-    for (const auto& tile : placedTiles) {
+    for (const auto& tile : placedTiles[index]) {
         if (tile.position == pos) return false;  // already placed
     }
 
@@ -148,7 +152,7 @@ bool tileCreator::placeTile(float x, float y, float blockSize)
         newTile.vertices.push_back(baseTile[idx + 4]);     // V
     }
 
-    placedTiles.push_back(newTile);
+    placedTiles[index].push_back(newTile);
     return true;
 }
 
@@ -156,11 +160,11 @@ bool tileCreator::removeTile(float x, float y)
 {
     glm::vec2 checkPos = { x, y };
 
-    for (auto x = placedTiles.begin(); x != placedTiles.end(); x++)
+    for (auto x = placedTiles[index].begin(); x != placedTiles[index].end(); x++)
     {
         if (x->position == checkPos)
         {
-            placedTiles.erase(x);
+            placedTiles[index].erase(x);
             break;
         }
     }
@@ -170,7 +174,7 @@ bool tileCreator::removeTile(float x, float y)
 void tileCreator::updateVertexBuffer()
 {
     verticeVector.clear();
-    for (const Tile& tile : placedTiles)
+    for (const Tile& tile : placedTiles[index])
     {
         verticeVector.insert(verticeVector.end(), tile.vertices.begin(), tile.vertices.end());
     }

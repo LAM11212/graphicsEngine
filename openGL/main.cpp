@@ -12,8 +12,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include "tileEditor/tileCreator.h"
+#include "mapManager/mapManager.h"
 
-void getBuildMode(GLFWwindow* window, tileCreator& tc);
+void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm);
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize);
 
 //********************************************************************
@@ -29,6 +30,7 @@ bool lKeyPressed = false;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool gridEnabled = false;
+int mapCount = 0;
 //********************************************************************
 //                         Main Function
 //********************************************************************
@@ -139,14 +141,9 @@ int main(void)
     myShader.setInt("playerSprite", 1);
     stbi_image_free(data2);
 
-    //********************************************************************
-    //                         Game Loop
-    //********************************************************************
 
     tileCreator tc;
 
-    bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     IMGUI_CHECKVERSION();
@@ -160,11 +157,17 @@ int main(void)
     glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
     tileCreator::UV uv;
+    mapManager mm;
+    mm.currentMapIndex = 0;
 
     ImTextureID my_tex_id = (ImTextureID)(intptr_t)texture;
     ImVec2 size = ImVec2(32.0f, 32.0f);
     ImVec4 bg_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+//********************************************************************
+//                         Game Loop
+//********************************************************************
 
     while (!glfwWindowShouldClose(window))
     {
@@ -173,7 +176,7 @@ int main(void)
         lastFrame = currentFrame;
 
         // input processing here:
-        getBuildMode(window, tc);
+        getBuildMode(window, tc, mm);
         if (buildMode)
         {
             verticesChanged = processInput(window, tc, blockSize);
@@ -224,6 +227,7 @@ int main(void)
         {
             tc.drawGrid(1200, 800, blockSize, proj);
         }
+
         int columns = 3;
         for (int i = 0; i < 10; i++)
         {
@@ -231,7 +235,11 @@ int main(void)
             ImVec2 uv0 = ImVec2(uv.uMin, uv.vMax);
             ImVec2 uv1 = ImVec2(uv.uMax, uv.vMin);
             std::string label = "Tile_" + std::to_string(i);
-            ImGui::ImageButton(label.c_str(), my_tex_id, size, uv0, uv1, bg_color, tint_col);
+            if (ImGui::ImageButton(label.c_str(), my_tex_id, size, uv0, uv1, bg_color, tint_col))
+            {
+                tc.selectTile(static_cast<tileCreator::tileType>(i));
+                std::cout << "Tile " << i << " selected\n";
+            }
             if ((i + 1) % columns != 0)
             {
                 ImGui::SameLine();
@@ -239,7 +247,32 @@ int main(void)
         }
         ImGui::NewLine();
 
-        //TODO: add a way to toggle between different maps using a drop down menu, also implement save/load functions.
+        //TODO: FIX THE TOGGLING BETWEEN MAPS TO CLEAR THE SCREEN
+        if (!mm.mapNames.empty() && mm.currentMapIndex < mm.mapNames.size())
+        {
+            if (ImGui::BeginCombo("Map Selector", mm.mapNames[mm.currentMapIndex].c_str()))
+            {
+                for (int i = 0; i < mm.mapNames.size(); i++)
+                {
+                    bool selected = (i == mm.currentMapIndex);
+                    if (ImGui::Selectable(mm.mapNames[i].c_str(), selected))
+                    {
+                        mm.switchTo(i);
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+        else
+        {
+            ImGui::Text("No Maps Available.");
+        }
+        
+        if (ImGui::Button("Create New Map", ImVec2(120, 16)))
+        {
+            std::string newName = "Map_" + std::to_string(mm.mapNames.size());
+            mm.createMap(newName);
+        }
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         
@@ -267,13 +300,14 @@ int main(void)
 //                         Process Inputs
 //********************************************************************
 
-void getBuildMode(GLFWwindow* window, tileCreator& tc) 
+void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm) 
 {
+    
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
         if (!pKeyPressed)
         {
-            tc.writeToFile(tc.placedTiles, "data.txt");
+            tc.writeToFile(tc.placedTiles[mm.currentMapIndex], "data.txt");
         }
         pKeyPressed = true;
     }
@@ -286,7 +320,7 @@ void getBuildMode(GLFWwindow* window, tileCreator& tc)
     {
         if (!lKeyPressed)
         {
-            tc.readFromFile(tc.placedTiles, "data.txt");
+            tc.readFromFile(tc.placedTiles[mm.currentMapIndex], "data.txt");
         }
         lKeyPressed = true;
     }
