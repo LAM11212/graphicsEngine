@@ -227,6 +227,12 @@ int main(void)
 
         ImGui::SliderFloat3("float", &translation.x, 0.0f, 1200.0f);
         ImGui::Checkbox("Show Grid", &gridEnabled);
+        ImGui::SameLine();
+        if (ImGui::Button("Clear Screen", ImVec2(120, 20)))
+        {
+            activeMap.clear();
+        }
+        ImGui::NewLine();
         if (gridEnabled)
         {
             activeMap.drawGrid(1200, 800, blockSize, proj);
@@ -272,7 +278,7 @@ int main(void)
             ImGui::Text("No Maps Available.");
         }
         
-        if (ImGui::Button("Create New Map", ImVec2(120, 16)))
+        if (ImGui::Button("Create New Map", ImVec2(120, 20)))
         {
             std::string newName = "Map_" + std::to_string(mm.mapNames.size());
             mm.createMap(newName);

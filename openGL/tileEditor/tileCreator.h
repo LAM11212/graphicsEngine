@@ -46,6 +46,8 @@ public:
 	void updateVertexBuffer();
 	void drawGrid(float width, float height, float blockSize, const glm::mat4& projection);
 	UV getTileUVs(int num);
+	void clear();
+
 
 	tileType selectedTile = Grass;
 

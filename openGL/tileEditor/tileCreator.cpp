@@ -250,3 +250,10 @@ tileCreator::UV tileCreator::getTileUVs(int num)
 
     return uv;
 }
+
+void tileCreator::clear()
+{
+    placedTiles.clear();
+    verticeVector.clear();
+    updateVertexBuffer();
+}
