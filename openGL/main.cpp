@@ -14,8 +14,8 @@
 #include "tileEditor/tileCreator.h"
 #include "mapManager/mapManager.h"
 
-void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm);
-bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize);
+void getBuildMode(GLFWwindow* window, tileCreator& tc);
+bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm);
 
 //********************************************************************
 //                         GLOBAL VARS
@@ -165,6 +165,8 @@ int main(void)
     ImVec4 bg_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+    mm.createMap("Map_0");
+
 //********************************************************************
 //                         Game Loop
 //********************************************************************
@@ -175,19 +177,21 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        tileCreator& activeMap = mm.currentMap();
+       
         // input processing here:
-        getBuildMode(window, tc, mm);
+        getBuildMode(window, mm.currentMap());
         if (buildMode)
         {
-            verticesChanged = processInput(window, tc, blockSize);
+            verticesChanged = processInput(window, mm.currentMap(), blockSize, mm);
         }
 
         if (verticesChanged)
         {
-            tc.updateVertexBuffer();
+            activeMap.updateVertexBuffer();
 
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, tc.verticeVector.size() * sizeof(float), tc.verticeVector.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, activeMap.verticeVector.size() * sizeof(float), activeMap.verticeVector.data(), GL_STATIC_DRAW);
             verticesChanged = false;
         }
         
@@ -211,8 +215,8 @@ int main(void)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        if (!tc.verticeVector.empty()) {
-            glDrawArrays(GL_TRIANGLES, 0, tc.verticeVector.size() / 5);
+        if (!activeMap.verticeVector.empty()) {
+            glDrawArrays(GL_TRIANGLES, 0, activeMap.verticeVector.size() / 5);
 
         }
 
@@ -225,7 +229,7 @@ int main(void)
         ImGui::Checkbox("Show Grid", &gridEnabled);
         if (gridEnabled)
         {
-            tc.drawGrid(1200, 800, blockSize, proj);
+            activeMap.drawGrid(1200, 800, blockSize, proj);
         }
 
         int columns = 3;
@@ -300,14 +304,14 @@ int main(void)
 //                         Process Inputs
 //********************************************************************
 
-void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm) 
+void getBuildMode(GLFWwindow* window, tileCreator& tc) 
 {
     
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
         if (!pKeyPressed)
         {
-            tc.writeToFile(tc.placedTiles[mm.currentMapIndex], "data.txt");
+            tc.writeToFile(tc.placedTiles, "data.txt");
         }
         pKeyPressed = true;
     }
@@ -320,7 +324,7 @@ void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm)
     {
         if (!lKeyPressed)
         {
-            tc.readFromFile(tc.placedTiles[mm.currentMapIndex], "data.txt");
+            tc.readFromFile(tc.placedTiles, "data.txt");
         }
         lKeyPressed = true;
     }
@@ -341,7 +345,7 @@ void getBuildMode(GLFWwindow* window, tileCreator& tc, mapManager& mm)
 
 }
 
-bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize)
+bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm)
 {
     static bool mouseHeld = false;
     double xpos, ypos;
@@ -369,14 +373,14 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize)
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !mouseHeld)
     {
-        if (tc.placeTile(snappedX, snappedY, blockSize))
+        if (mm.currentMap().placeTile(snappedX, snappedY, blockSize))
         {
             return true;
         }
     }
     else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
     {
-        if (tc.removeTile(snappedX, snappedY))
+        if (mm.currentMap().removeTile(snappedX, snappedY))
         {
             return true;
         }

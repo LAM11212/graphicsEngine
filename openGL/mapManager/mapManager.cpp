@@ -7,12 +7,12 @@
 
 mapManager::mapManager() {};
 
-std::vector <tileCreator::Tile> mapManager::createMap(const std::string& name)
+void mapManager::createMap(const std::string& name)
 {
-	maps.push_back({});
+	tileCreator newMap;
+	maps.push_back(newMap);
 	mapNames.push_back(name);
 	currentMapIndex = static_cast<int>(maps.size()) - 1; 
-	return maps.back();
 }
 
 void mapManager::switchTo(int index)
@@ -20,7 +20,7 @@ void mapManager::switchTo(int index)
 	currentMapIndex = index;
 }
 
-std::vector<tileCreator::Tile>& mapManager::currentMap()
+tileCreator& mapManager::currentMap()
 {
 	return maps[currentMapIndex];
 }

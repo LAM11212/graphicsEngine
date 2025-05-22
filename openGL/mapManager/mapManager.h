@@ -12,12 +12,12 @@ public:
 	mapManager();
 
 	std::vector<std::string> mapNames;
-	std::vector<std::vector<tileCreator::Tile>> maps;
+	std::vector<tileCreator> maps;
 	int currentMapIndex = 0;
 
-	std::vector<tileCreator::Tile> createMap(const std::string& name);
+	void createMap(const std::string& name);
 	void switchTo(int index);
-	std::vector<tileCreator::Tile>& currentMap();
+	tileCreator& currentMap();
 };
 
 

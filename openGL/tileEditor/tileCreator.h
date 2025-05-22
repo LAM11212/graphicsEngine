@@ -33,7 +33,7 @@ public:
 		Water,
 		Lava
 	};
-	std::vector<std::vector<Tile>> placedTiles;
+	std::vector<Tile> placedTiles;
 	std::vector<float> verticeVector;
 
 	std::vector<float> makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax);
