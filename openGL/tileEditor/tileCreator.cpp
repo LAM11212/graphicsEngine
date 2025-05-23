@@ -136,6 +136,11 @@ bool tileCreator::placeTile(float x, float y, float blockSize)
     case Sand: texX = sandX; texY = sandY; break;
     case Water: texX = waterX; texY = waterY; break;
     case Lava: texX = lavaX; texY = lavaY; break;
+    case Glass: texX = glassX; texY = glassY; break;
+    case Oak: texX = oakX; texY = oakY; break;
+    case Leaves: texX = leavesX; texY = leavesY; break;
+    case Torch: texX = torchX; texY = torchY; break;
+    case Rose: texX = roseX; texY = roseY; break;
     }
 
     UV uv = calculateUV(texX, texY);
@@ -244,6 +249,11 @@ tileCreator::UV tileCreator::getTileUVs(int num)
     case 7: texX = sandX; texY = sandY; break;
     case 8: texX = waterX; texY = waterY; break;
     case 9: texX = lavaX; texY = lavaY; break;
+    case 10: texX = glassX; texY = glassY; break;
+    case 11: texX = oakX; texY = oakY; break;
+    case 12: texX = leavesX; texY = leavesY; break;
+    case 13: texX = torchX; texY = torchY; break;
+    case 14: texX = roseX; texY = roseY; break;
     }
 
     UV uv = calculateUV(texX, texY);
@@ -271,6 +281,11 @@ const char* tileCreator::getStringFromEnum(tileCreator::tileType type)
     case tileCreator::Sand: return "Sand";
     case tileCreator::Water: return "Water";
     case tileCreator::Lava: return "Lava";
+    case tileCreator::Glass: return "Glass";
+    case tileCreator::Oak: return "Oak";
+    case tileCreator::Leaves: return "Leaves";
+    case tileCreator::Torch: return "Torch";
+    case tileCreator::Rose: return "Rose";
     default: return "Unknown";
     }
 }

@@ -67,6 +67,9 @@ int main(void)
     glm::mat4 proj = glm::ortho(0.0f, 1200.0f, 0.0f, 800.0f, -1.0f, 1.0f);
 
     Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     
     //********************************************************************
@@ -239,7 +242,7 @@ int main(void)
         }
 
         int columns = 3;
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < activeMap.numOfTileTypes; i++)
         {
             uv = activeMap.getTileUVs(i);
             ImVec2 uv0 = ImVec2(uv.uMin, uv.vMax);

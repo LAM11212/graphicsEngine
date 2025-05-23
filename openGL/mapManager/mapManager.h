@@ -20,5 +20,4 @@ public:
 	tileCreator& currentMap();
 };
 
-
 #endif

@@ -31,10 +31,16 @@ public:
 		Gravel,
 		Sand,
 		Water,
-		Lava
+		Lava,
+		Glass,
+		Oak,
+		Leaves,
+		Torch,
+		Rose
 	};
 	std::vector<Tile> placedTiles;
 	std::vector<float> verticeVector;
+	const int numOfTileTypes = 15;
 
 	std::vector<float> makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax);
 	void writeToFile(const std::vector<Tile>& allTiles, std::string fileName);
@@ -68,6 +74,11 @@ private:
 	static constexpr int sandX = 0, sandY = 14;
 	static constexpr int waterX = 0, waterY = 0;
 	static constexpr int lavaX = 0, lavaY = 1;
+	static constexpr int glassX = 1, glassY = 14;
+	static constexpr int oakX = 2, oakY = 14;
+	static constexpr int leavesX = 4, leavesY = 14;
+	static constexpr int torchX = 0, torchY = 13;
+	static constexpr int roseX = 0, roseY = 12;
 };
 
 #endif
