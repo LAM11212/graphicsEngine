@@ -287,6 +287,18 @@ int main(void)
             mm.createMap(newName);
         }
 
+        if (ImGui::Button("Save", ImVec2(56, 20)))
+        {
+            activeMap.writeToFile(activeMap.placedTiles, "data.txt");
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Load", ImVec2(56, 20)))
+        {
+            activeMap.readFromFile(activeMap.placedTiles, "data.txt");
+        }
+
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         
         ImGui::End();
