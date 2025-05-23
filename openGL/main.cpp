@@ -16,6 +16,7 @@
 
 void getBuildMode(GLFWwindow* window, tileCreator& tc);
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 //********************************************************************
 //                         GLOBAL VARS
@@ -31,6 +32,8 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool gridEnabled = false;
 int mapCount = 0;
+int windowWidth = 1200;
+int windowHeight = 800;
 //********************************************************************
 //                         Main Function
 //********************************************************************
@@ -64,7 +67,7 @@ int main(void)
         return -1;
     }
 
-    glm::mat4 proj = glm::ortho(0.0f, 1200.0f, 0.0f, 800.0f, -1.0f, 1.0f);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
 
@@ -179,6 +182,14 @@ int main(void)
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
+        if (windowWidth == 0 || windowHeight == 0)
+        {
+            return -1;
+        }
+
+        glm::mat4 proj = glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight), -1.0f, 1.0f);
 
         tileCreator& activeMap = mm.currentMap();
        
@@ -328,6 +339,11 @@ int main(void)
 //                         Process Inputs
 //********************************************************************
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 void getBuildMode(GLFWwindow* window, tileCreator& tc) 
 {
     
@@ -366,7 +382,6 @@ void getBuildMode(GLFWwindow* window, tileCreator& tc)
     {
         buildMode = false;
     }
-
 }
 
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm)
@@ -382,7 +397,6 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
 
     float snappedX = floor(worldX / blockSize) * blockSize + blockSize / 2.0f;
     float snappedY = floor(worldY / blockSize) * blockSize + blockSize / 2.0f;
-
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) tc.selectTile(tileCreator::Grass);
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) tc.selectTile(tileCreator::Side);
@@ -409,7 +423,6 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
             return true;
         }
     }
-
 
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
