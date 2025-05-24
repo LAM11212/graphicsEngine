@@ -15,7 +15,7 @@ public:
 	std::vector<tileCreator> maps;
 	int currentMapIndex = 0;
 
-	void createMap(const std::string& name);
+	void createMap(const std::string& name, unsigned int tileVBO);
 	void switchTo(int index);
 	tileCreator& currentMap();
 };

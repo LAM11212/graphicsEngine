@@ -1,4 +1,5 @@
 #include "mapManager.h"
+#include "../tileEditor/tileCreator.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <fstream>
@@ -7,9 +8,10 @@
 
 mapManager::mapManager() {};
 
-void mapManager::createMap(const std::string& name)
+void mapManager::createMap(const std::string& name, unsigned int tileVBO)
 {
-	tileCreator newMap;
+	tileCreator newMap(tileVBO);
+	newMap.updateVertexBuffer();
 	maps.push_back(newMap);
 	mapNames.push_back(name);
 	currentMapIndex = static_cast<int>(maps.size()) - 1; 
@@ -18,6 +20,7 @@ void mapManager::createMap(const std::string& name)
 void mapManager::switchTo(int index)
 {
 	currentMapIndex = index;
+	maps[index].updateVertexBuffer();
 }
 
 tileCreator& mapManager::currentMap()

@@ -8,7 +8,7 @@
 class tileCreator
 {
 public:
-	tileCreator();
+	tileCreator(unsigned int tileVBO);
 
 	struct Tile {
 		glm::vec2 position;
@@ -58,7 +58,7 @@ public:
 	tileType selectedTile = Grass;
 
 private:
-	
+	unsigned int tileVBO;
 	static constexpr int TILE_WIDTH = 16;
 	static constexpr int TILE_HEIGHT = 16;
 	static constexpr float UVSize = 1.0f / TILE_HEIGHT;

@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-tileCreator::tileCreator() {}
+tileCreator::tileCreator(unsigned int tileVBO) : tileVBO(tileVBO) {}
 
 std::vector<float> tileCreator::makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax)
 {
@@ -183,6 +183,9 @@ void tileCreator::updateVertexBuffer()
     {
         verticeVector.insert(verticeVector.end(), tile.vertices.begin(), tile.vertices.end());
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, tileVBO);
+    glBufferData(GL_ARRAY_BUFFER, verticeVector.size() * sizeof(float), verticeVector.data(), GL_STATIC_DRAW);
 }
 
 void tileCreator::drawGrid(float width, float height, float blockSize, const glm::mat4& projection)

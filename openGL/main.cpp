@@ -148,7 +148,7 @@ int main(void)
     stbi_image_free(data2);
 
 
-    tileCreator tc;
+    tileCreator tc(VBO);
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -171,7 +171,7 @@ int main(void)
     ImVec4 bg_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-    mm.createMap("Map_0");
+    mm.createMap("Map_0", VBO);
 
 //********************************************************************
 //                         Game Loop
@@ -192,7 +192,7 @@ int main(void)
         glm::mat4 proj = glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight), -1.0f, 1.0f);
 
         tileCreator& activeMap = mm.currentMap();
-       
+        
         // input processing here:
         getBuildMode(window, mm.currentMap());
         if (buildMode)
@@ -298,7 +298,7 @@ int main(void)
         if (ImGui::Button("Create New Map", ImVec2(120, 20)))
         {
             std::string newName = "Map_" + std::to_string(mm.mapNames.size());
-            mm.createMap(newName);
+            mm.createMap(newName, VBO);
         }
 
         if (ImGui::Button("Save", ImVec2(56, 20)))
@@ -409,20 +409,24 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
     if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) tc.selectTile(tileCreator::Water);
     if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) tc.selectTile(tileCreator::Lava);
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !mouseHeld)
+    if (!ImGui::GetIO().WantCaptureMouse)
     {
-        if (mm.currentMap().placeTile(snappedX, snappedY, blockSize))
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !mouseHeld)
         {
-            return true;
+            if (mm.currentMap().placeTile(snappedX, snappedY, blockSize))
+            {
+                return true;
+            }
+        }
+        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
+        {
+            if (mm.currentMap().removeTile(snappedX, snappedY))
+            {
+                return true;
+            }
         }
     }
-    else if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
-    {
-        if (mm.currentMap().removeTile(snappedX, snappedY))
-        {
-            return true;
-        }
-    }
+    
 
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
