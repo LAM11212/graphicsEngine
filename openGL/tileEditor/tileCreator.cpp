@@ -55,9 +55,10 @@ void tileCreator::readFromFile(std::vector<Tile>& allTiles, const std::string fi
     std::ifstream file(fileName);
     if (!file.is_open())
     {
-        std::cout << "failed to opne file." << std::endl;
+        std::cout << "failed to open file." << std::endl;
         return;
     }
+    allTiles.clear();
 
     std::string line;
     std::vector<float> tempVerts;
@@ -167,13 +168,16 @@ bool tileCreator::removeTile(float x, float y)
 
     for (auto x = placedTiles.begin(); x != placedTiles.end(); x++)
     {
-        if (x->position == checkPos)
+        glm::vec2 pos = x->position;
+        float tileSize = 16.0f;
+
+        if (checkPos.x >= pos.x && checkPos.x <= pos.x + tileSize && checkPos.y >= pos.y && checkPos.y <= pos.y + tileSize)
         {
             placedTiles.erase(x);
-            break;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 void tileCreator::updateVertexBuffer()
