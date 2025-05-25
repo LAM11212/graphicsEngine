@@ -37,6 +37,7 @@ int mapCount = 0;
 int windowWidth = 1200;
 int windowHeight = 800;
 float zoom = 1.0f;
+int chunkIndex = 0;
 //********************************************************************
 //                         Main Function
 //********************************************************************
@@ -390,7 +391,7 @@ void getBuildMode(GLFWwindow* window, tileCreator& tc)
 
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm)
 {
-    static bool mouseHeld = false;
+    static bool mouseHeld;
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
@@ -413,16 +414,23 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
     if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) tc.selectTile(tileCreator::Water);
     if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) tc.selectTile(tileCreator::Lava);
 
+    std::cout << chunkIndex << std::endl;
+
+    //TODO: you have the mouse held bool working correctly, so now all you have to do is when that value is true,
+    //add each tile to the chunk vector in the tilecreator class, and then when the user presses ctrl + z, just
+    //delete that chunk at that index, so also find a way to keep track of an index whenever you click, not sure
+    //how yet but working on it.
     if (!ImGui::GetIO().WantCaptureMouse)
     {
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !mouseHeld)
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
+            mouseHeld = true;
             if (mm.currentMap().placeTile(snappedX, snappedY, blockSize))
             {
                 return true;
             }
         }
-        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !mouseHeld)
+        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
         {
             if (mm.currentMap().removeTile(snappedX, snappedY))
             {
@@ -430,11 +438,11 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
             }
         }
     }
-    
 
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
         mouseHeld = false;
+        chunkIndex++;
     }
 
     return false;

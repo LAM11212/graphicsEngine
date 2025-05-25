@@ -39,6 +39,7 @@ public:
 		Rose
 	};
 	std::vector<Tile> placedTiles;
+	std::vector<Tile> chunks;
 	std::vector<float> verticeVector;
 	const int numOfTileTypes = 15;
 
@@ -49,6 +50,7 @@ public:
 	bool placeTile(float x, float y, float blockSize);
 	bool removeTile(float x, float y);
 	void selectTile(tileType type);
+	bool chunk(float x, float y, float blockSize);
 	void updateVertexBuffer();
 	void drawGrid(float width, float height, float blockSize, const glm::mat4& projection);
 	UV getTileUVs(int num);

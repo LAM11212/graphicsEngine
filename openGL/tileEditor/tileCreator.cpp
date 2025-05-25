@@ -180,6 +180,55 @@ bool tileCreator::removeTile(float x, float y)
     return false;
 }
 
+bool tileCreator::chunk(float x, float y, float blockSize)
+{
+    if (chunks.empty())
+    {
+        chunks.push_back({});
+    }
+    glm::vec2 pos = { x, y };
+
+    for (const auto& tile : chunks) {
+        if (tile.position == pos) return false;  // already placed
+    }
+
+    int texX = 0, texY = 0;
+    switch (selectedTile) {
+    case Grass: texX = grassX; texY = grassY; break;
+    case Side: texX = sideX; texY = sideY; break;
+    case Dirt: texX = dirtX; texY = dirtY; break;
+    case Stone: texX = stoneX; texY = stoneY; break;
+    case Coal: texX = coalX; texY = coalY; break;
+    case Iron: texX = ironX; texY = ironY; break;
+    case Gravel: texX = gravelX; texY = gravelY; break;
+    case Sand: texX = sandX; texY = sandY; break;
+    case Water: texX = waterX; texY = waterY; break;
+    case Lava: texX = lavaX; texY = lavaY; break;
+    case Glass: texX = glassX; texY = glassY; break;
+    case Oak: texX = oakX; texY = oakY; break;
+    case Leaves: texX = leavesX; texY = leavesY; break;
+    case Torch: texX = torchX; texY = torchY; break;
+    case Rose: texX = roseX; texY = roseY; break;
+    }
+
+    UV uv = calculateUV(texX, texY);
+    std::vector<float> baseTile = makeBaseTile(blockSize, uv.uMin, uv.uMax, uv.vMin, uv.vMax);
+
+    Tile newTile;
+    newTile.position = pos;
+    for (int i = 0; i < 6; ++i) {
+        int idx = i * 5;
+        newTile.vertices.push_back(baseTile[idx + 0] + x); // X
+        newTile.vertices.push_back(baseTile[idx + 1] + y); // Y
+        newTile.vertices.push_back(baseTile[idx + 2]);     // Z
+        newTile.vertices.push_back(baseTile[idx + 3]);     // U
+        newTile.vertices.push_back(baseTile[idx + 4]);     // V
+    }
+
+    chunks.push_back(newTile);
+    return true;
+}
+
 void tileCreator::updateVertexBuffer()
 {
     verticeVector.clear();
