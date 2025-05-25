@@ -39,9 +39,11 @@ public:
 		Rose
 	};
 	std::vector<Tile> placedTiles;
-	std::vector<Tile> chunks;
+	std::vector<std::vector<Tile>> chunks;
+	std::vector<Tile> pushBackChunks;
 	std::vector<float> verticeVector;
 	const int numOfTileTypes = 15;
+	int prevChunkSize = 0;
 
 	std::vector<float> makeBaseTile(float blockSize, float uMin, float uMax, float vMin, float vMax);
 	void writeToFile(const std::vector<Tile>& allTiles, std::string fileName);
@@ -56,6 +58,7 @@ public:
 	UV getTileUVs(int num);
 	void clear();
 	const char* getStringFromEnum(tileCreator::tileType type);
+	void undoLastChunk();
 
 	tileType selectedTile = Grass;
 

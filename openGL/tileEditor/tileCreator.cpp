@@ -168,12 +168,10 @@ bool tileCreator::removeTile(float x, float y)
 
     for (auto x = placedTiles.begin(); x != placedTiles.end(); x++)
     {
-        glm::vec2 pos = x->position;
-        float tileSize = 16.0f;
-
-        if (checkPos.x >= pos.x && checkPos.x <= pos.x + tileSize && checkPos.y >= pos.y && checkPos.y <= pos.y + tileSize)
+        if (x->position == checkPos)
         {
             placedTiles.erase(x);
+            updateVertexBuffer();
             return true;
         }
     }
@@ -182,13 +180,13 @@ bool tileCreator::removeTile(float x, float y)
 
 bool tileCreator::chunk(float x, float y, float blockSize)
 {
-    if (chunks.empty())
+    if (pushBackChunks.empty())
     {
-        chunks.push_back({});
+        pushBackChunks.push_back({});
     }
     glm::vec2 pos = { x, y };
 
-    for (const auto& tile : chunks) {
+    for (const auto& tile : pushBackChunks) {
         if (tile.position == pos) return false;  // already placed
     }
 
@@ -225,8 +223,22 @@ bool tileCreator::chunk(float x, float y, float blockSize)
         newTile.vertices.push_back(baseTile[idx + 4]);     // V
     }
 
-    chunks.push_back(newTile);
+    pushBackChunks.push_back(newTile);
     return true;
+}
+
+void tileCreator::undoLastChunk()
+{
+    if (!chunks.empty())
+    {
+        auto& lastChunk = chunks.back();
+        for (const auto& tile : lastChunk)
+        {
+            removeTile(tile.position.x, tile.position.y);
+        }
+        chunks.pop_back();
+        updateVertexBuffer();
+    }
 }
 
 void tileCreator::updateVertexBuffer()
