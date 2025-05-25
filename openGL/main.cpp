@@ -13,10 +13,12 @@
 #include <vector>
 #include "tileEditor/tileCreator.h"
 #include "mapManager/mapManager.h"
+#include <algorithm>
 
 void getBuildMode(GLFWwindow* window, tileCreator& tc);
 bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManager& mm);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 //********************************************************************
 //                         GLOBAL VARS
@@ -34,6 +36,7 @@ bool gridEnabled = false;
 int mapCount = 0;
 int windowWidth = 1200;
 int windowHeight = 800;
+float zoom = 1.0f;
 //********************************************************************
 //                         Main Function
 //********************************************************************
@@ -67,6 +70,7 @@ int main(void)
         return -1;
     }
 
+    glfwSetScrollCallback(window, scroll_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     Shader myShader("shaders/texture1.vs", "shaders/texture1.fs");
@@ -189,7 +193,7 @@ int main(void)
             return -1;
         }
 
-        glm::mat4 proj = glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight), -1.0f, 1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, float(windowWidth) / zoom, 0.0f, float(windowHeight) / zoom, -1.0f, 1.0f);
 
         tileCreator& activeMap = mm.currentMap();
         
@@ -392,8 +396,8 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    float worldX = static_cast<float>(xpos);
-    float worldY = static_cast<float>(height - ypos);
+    float worldX = static_cast<float>(xpos) / zoom;
+    float worldY = static_cast<float>(height - ypos) / zoom;
 
     float snappedX = floor(worldX / blockSize) * blockSize + blockSize / 2.0f;
     float snappedY = floor(worldY / blockSize) * blockSize + blockSize / 2.0f;
@@ -434,4 +438,22 @@ bool processInput(GLFWwindow* window, tileCreator& tc, float blockSize, mapManag
     }
 
     return false;
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+
+    if (yoffset != 0)
+    {
+        float zoomFactor = 1.1f;
+        if (yoffset > 0)
+        {
+            zoom *= zoomFactor;
+        }
+        else
+        {
+            zoom /= zoomFactor;
+        }
+    }
+
 }
