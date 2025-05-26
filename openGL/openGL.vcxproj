@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="dependencies\include\glm\detail\glm.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="GuiManager\guiManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -443,6 +444,7 @@
     <ClInclude Include="dependencies\include\glm\vector_relational.hpp" />
     <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
     <ClInclude Include="dependencies\include\stb\stb_image.h" />
+    <ClInclude Include="GuiManager\guiManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />

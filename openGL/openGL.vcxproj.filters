@@ -51,6 +51,9 @@
     <ClCompile Include="mapManager\mapManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GuiManager\guiManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\GLFW\glfw3.h">
@@ -969,6 +972,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="camera\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiManager\guiManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
